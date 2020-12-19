@@ -1,3 +1,4 @@
+#![allow(warnings)]
 #[macro_use]
 extern crate lazy_static;
 
@@ -9,22 +10,62 @@ mod handheld;
 mod xmas_cracker;
 
 use std::fs;
-use std::borrow::Borrow;
-use crate::handheld::parse;
-use crate::xmas_cracker::Xmas;
-
 
 fn main() -> Result<(), String>{
-    let contents = fs::read_to_string("input/day9.txt")
+    let contents = fs::read_to_string("input/day10.txt")
         .expect("Error reading file").to_owned();
     let lines : Vec<&str> = contents.lines().collect();
-    let nums : Vec<i64>= lines.iter().map(|ln| ln.parse().unwrap()).collect();
-    let input = Xmas::new(nums, 25);
-    let goal = input.find();
-    let mut span = input.find_sum_range(goal);
-    span.sort();
-    println!("{:?}", span[0] + span[span.len() - 1]);
+    let mut nums : Vec<i32>= lines.iter().map(|ln| ln.parse().unwrap()).collect();
+    nums.sort();
+    let goal = nums.last().unwrap() + 3;
+    nums.push(goal);    
+    let mut j = 0;
+    let mut diffs = Vec::new();
+    for adapter in nums {
+        diffs.push(adapter - j);
+        j += adapter - j;
+    }
+    println!("{:?}", diffs);
+    let result = count_branches(&diffs[..]);
+    println!("{:?}", result);
     Ok(())
 }
 
+fn count_branches(diffs : &[i32]) -> i64 {
+    let mut one_blocks = Vec::new();
+    let mut current_count = 0;
+    for diff in diffs {
+        if *diff == 1 {
+            current_count += 1;
+        } else if current_count != 0 {
+            one_blocks.push(current_count);
+            current_count = 0;
+        }
+    }
+    if current_count != 0 {
 
+    }
+    println!("{:?}",one_blocks);
+    let mut result = 1;
+    for block in one_blocks {
+        match block {
+            1 => (),
+            2 => result *= 2,
+            3 => result *= 4,
+            4 => result *= 7,
+            _ => ()
+        }
+    }
+    result
+}
+
+fn count_next_possibilities(curr_jolts: i32, goal: i32, adapters: &[i32]) -> Vec<i32> {
+    let mut j = curr_jolts;
+    let mut diffs = Vec::new();
+    for adapter in adapters {
+        diffs.push(adapter - j);
+        j += adapter - j;
+    }
+        
+    diffs
+}
