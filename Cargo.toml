@@ -9,8 +9,3 @@ edition = "2018"
 [dependencies]
 regex = "1.4.2"
 lazy_static = "1.4.0"
-minilp = "0.2.2"
-lp-modeler = "0.4.3"
-
-[build]
-rustflags = ["-C", "link-args=-L/home/lt93pj/Utils/cbc/lib"]

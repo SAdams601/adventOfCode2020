@@ -12,9 +12,6 @@ mod ferry;
 mod ship;
 
 use std::fs;
-use minilp::{Problem, OptimizationDirection, ComparisonOp};
-use lp_modeler::solvers::{SolverTrait};
-use lp_modeler::dsl::*;
 
 
 fn main() {
@@ -29,29 +26,23 @@ fn main() {
             id.parse::<i32>().ok().and_then(|id_i32| Some((indx as i32, id_i32)))
         }
     }).collect();
+    let t_min = 21.0;
     let result = solve(busses);
     println!("{:?}", result)
 }
 
 fn solve(busses : Vec<(i32, i32)>) -> i64 {
-/*    let mut problem = Problem::new(OptimizationDirection::Minimize);
-    let t_min = (busses.iter().map(|t| t.1).max().unwrap() + 1) as f64;
-    let t = problem.add_var(1.0, (t_min, f64::INFINITY));
-
-    for (i,bus) in busses {
-        let c = problem.add_var(0.0, (t_min, f64::INFINITY));
-        problem.add_constraint(&[(c, bus as f64), (t, -1.0)], ComparisonOp::Eq, i as f64);
+   let mut t = 0;
+   let mut incr = busses[0].1 as i64;
+   for j in 1..busses.len() {
+        let (i, bus) = busses[j];
+        loop {
+            if (t + (i as i64)) % (bus as i64) == 0 {
+                incr = (incr * (bus as i64));
+                break;
+            }
+            t += incr;
     }
-    let solution = problem.solve().unwrap();
-    solution.objective() as i64*/
-
-    let ref t = LpInteger::new("t");
-    let mut problem = LpProblem::new("", LpObjective::Maximize);
-    problem += t;
-
-    for (i,bus) in busses {
-        let c_name = format!("c_{}", i);
-        let ref c = LpInteger::new(&c_name);
-    }
-    0
+   }
+   t
 }
