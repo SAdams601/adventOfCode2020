@@ -12,14 +12,18 @@ mod ferry;
 mod ship;
 mod bitmask;
 mod memory;
+mod tickets;
 
 use std::fs;
-use crate::memory::play;
+use crate::tickets::parse;
+use crate::tickets::solve;
 
 fn main() {
-    let contents = fs::read_to_string("input/day15.txt")
+    let contents = fs::read_to_string("input/day16.txt")
         .expect("Error reading file").to_owned();
-    let start: Vec<i32> = contents.split(',').map(|num| num.parse().expect("Found non number")).collect();
-    let result = play(start);
+    let lines: Vec<String> = contents.lines().map(|ln| ln.to_string()).collect();
+    let mut parsed = parse(&lines);
+    let positions = solve(&parsed.fields, &parsed.other_tickets);
+    let result = positions.iter().map(|&pos| &parsed.my_ticket[pos]).fold(1 as i64, |x,y| x * (*y as i64));
     println!("{}", result);
 }
